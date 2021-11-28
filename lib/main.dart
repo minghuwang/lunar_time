@@ -6,6 +6,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  MyApp() : super() {}
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -40,45 +41,46 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  List<String> lunarVi;
-  DateTime myTime;
+  List<String> lunarTimeCN;
+  DateTime solarTime;
   String lunarHour;
   String currentHour;
   String currentMin;
   String currentSec;
 
-  void getCurrentTime() {
-    setState(() {
-      myTime = DateTime.now();
-
-      // int hour = myTime.hour;
-      lunarHour = change2LunarHour(myTime.hour);
-      List<int> tmpLunarVi = CalendarConverter.solarToLunar(
-          myTime.year, myTime.month, myTime.day, Timezone.Chinese);
-      lunarVi = transfer2Upper(tmpLunarVi);
-      currentHour = myTime.hour.toString();
-      if (myTime.hour < 10) {
-        currentHour = "0" + currentHour;
-      }
-      currentMin = myTime.minute.toString();
-      if (myTime.minute < 10) {
-        currentMin = "0" + currentMin;
-      }
-        currentSec = myTime.second.toString();
-      if (myTime.second < 10) {
-        currentSec = "0" + currentSec;
-      }
-
-    });
+  void getCurrentTime() async {
+    solarTime = DateTime.now();
+    while(true) {
+      await new Future.delayed(const Duration(seconds: 1));
+      solarTime = DateTime.now();
+      setState(() {
+        lunarHour = changeSolar2LunarHour(solarTime.hour);
+        List<int> tmpLunarTime = CalendarConverter.solarToLunar(
+            solarTime.year, solarTime.month, solarTime.day, Timezone.Chinese);
+        lunarTimeCN = transferDigit2Chinese(tmpLunarTime);
+        currentHour = solarTime.hour.toString();
+        if (solarTime.hour < 10) {
+          currentHour = "0" + currentHour;
+        }
+        currentMin = solarTime.minute.toString();
+        if (solarTime.minute < 10) {
+          currentMin = "0" + currentMin;
+        }
+        currentSec = solarTime.second.toString();
+        if (solarTime.second < 10) {
+          currentSec = "0" + currentSec;
+        }
+      });
+    }
   }
 
-  String change2LunarHour(int hour) {
+  String changeSolar2LunarHour(int hour) {
     List<String> lunarHour = [
       "子时", "丑时", "寅时", "卯时",
       "辰时", "巳时", "午时", "未时",
       "申时", "酉时", "戌时", "亥时",
     ];
-    if (hour >= 23 && hour < 1) return lunarHour[0];
+    if (hour >= 23 || hour < 1) return lunarHour[0];
     if (hour >= 1 && hour < 3) return lunarHour[1];
     if (hour >= 3 && hour < 5) return lunarHour[2];
     if (hour >= 5 && hour < 7) return lunarHour[3];
@@ -92,15 +94,15 @@ class _MyHomePageState extends State<MyHomePage> {
     if (hour >= 21 && hour < 23) return lunarHour[11];
   }
   //Transfer 2021 to 二零二一
-  List<String> transfer2Upper(List<int> lunarVi) {
+  List<String> transferDigit2Chinese(List<int> lunarTimeCN) {
     List<String> l = [];
-    l.add(changeInt2UpperStringForMonthNDay(lunarVi[0])); // day
-    l.add(changeInt2UpperStringForMonthNDay(lunarVi[1])); //month
-    l.add(changeInt2UpperStringForYear(lunarVi[2])); //year
+    l.add(changeDigit2ChineseStringForMonthNDay(lunarTimeCN[0])); // day
+    l.add(changeDigit2ChineseStringForMonthNDay(lunarTimeCN[1])); //month
+    l.add(changeDigit2ChineseStringForYear(lunarTimeCN[2])); //year
     return l;
   }
 
-  String changeInt2UpperStringForMonthNDay(int time) {
+  String changeDigit2ChineseStringForMonthNDay(int time) {
     List<String> zeroTo31 = [
       // 零 is stub
       "零", "一", "二", "三", "四", "五", "六", "七", "八", "九",
@@ -111,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return zeroTo31[time];
   }
 
-  String changeInt2UpperStringForYear(int time) {
+  String changeDigit2ChineseStringForYear(int time) {
     List<String> zero2nine = [
       "零", "一", "二", "三", "四", "五", "六", "七", "八", "九",
     ];
@@ -138,6 +140,9 @@ class _MyHomePageState extends State<MyHomePage> {
         // ),
         // debugShowCheckedModeBanner: false,
         return Scaffold(
+          appBar: AppBar(
+            title: Text("蔡竺螢国学院"),
+          ),
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -149,18 +154,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 //       .headline5,
                 // ),
                 Text('现在时辰',style: TextStyle(color: Colors.black,fontSize:30 ), ),
-                Text('\n公历: ${myTime.year}年${myTime.month}月${myTime.day}日${currentHour}:${currentMin}:${currentSec}',style: TextStyle(color: Colors.black54,fontSize:20), ),
-                Text('\n农历: ${lunarVi[2]}年${lunarVi[1]}月${lunarVi[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
+                Text('\n公历: ${solarTime.year}年${solarTime.month}月${solarTime.day}日${currentHour}:${currentMin}:${currentSec}',style: TextStyle(color: Colors.black54,fontSize:20), ),
+                Text('\n农历: ${lunarTimeCN[2]}年${lunarTimeCN[1]}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
                 Text('${lunarHour}',style: TextStyle(color: Colors.black,fontSize:20),),
               ],
             ),
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: getCurrentTime,
-            tooltip: '刷新',
-            child: Icon(Icons.refresh
-            ),
-          ),
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: getCurrentTime,
+          //   tooltip: '刷新',
+          //   child: Icon(Icons.refresh
+          //   ),
+          // ),
         );// This trailing comma makes auto-formatting nicer for build methods.
         // );
   }

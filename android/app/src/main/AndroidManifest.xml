@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.wangcai.lunar_time">
    <application
-        android:label="lunar_time"
+        android:label="当日时辰"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
