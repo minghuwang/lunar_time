@@ -1,5 +1,6 @@
 import 'package:lunar_calendar/lunar_calendar.dart';
 import 'package:flutter/material.dart';
+import 'TianGanDiZhi.dart';
 
 void main() {
   runApp(MyApp());
@@ -41,13 +42,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  List<int> lunarTimeDigital;
   List<String> lunarTimeCN;
+
   DateTime solarTime;
   String lunarHour;
   String currentHour;
   String currentMin;
   String currentSec;
 
+
+  String ganZhiYear;
+  String ganZhiMonth;
+  String ganZhiDay;
+  var tiangandizhi = new TianGanDiZhi();
   void getCurrentTime() async {
     solarTime = DateTime.now();
     while(true) {
@@ -55,9 +63,9 @@ class _MyHomePageState extends State<MyHomePage> {
       solarTime = DateTime.now();
       setState(() {
         lunarHour = changeSolar2LunarHour(solarTime.hour);
-        List<int> tmpLunarTime = CalendarConverter.solarToLunar(
+        lunarTimeDigital = CalendarConverter.solarToLunar(
             solarTime.year, solarTime.month, solarTime.day, Timezone.Chinese);
-        lunarTimeCN = transferDigit2Chinese(tmpLunarTime);
+        lunarTimeCN = transferDigit2Chinese(lunarTimeDigital);
         currentHour = solarTime.hour.toString();
         if (solarTime.hour < 10) {
           currentHour = "0" + currentHour;
@@ -94,11 +102,11 @@ class _MyHomePageState extends State<MyHomePage> {
     if (hour >= 21 && hour < 23) return lunarHour[11];
   }
   //Transfer 2021 to 二零二一
-  List<String> transferDigit2Chinese(List<int> lunarTimeCN) {
+  List<String> transferDigit2Chinese(List<int> lunarTime) {
     List<String> l = [];
-    l.add(changeDigit2ChineseStringForMonthNDay(lunarTimeCN[0])); // day
-    l.add(changeDigit2ChineseStringForMonthNDay(lunarTimeCN[1])); //month
-    l.add(changeDigit2ChineseStringForYear(lunarTimeCN[2])); //year
+    l.add(changeDigit2ChineseStringForMonthNDay(lunarTime[0])); // day
+    l.add(changeDigit2ChineseStringForMonthNDay(lunarTime[1])); //month
+    l.add(changeDigit2ChineseStringForYear(lunarTime[2])); //year
     return l;
   }
 
@@ -130,15 +138,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     getCurrentTime();
-    // return MaterialApp(
-        // theme: ThemeData(
-        //   // primarySwatch: COLORS.APP_THEME_COLOR,
-        //   // primaryTextTheme: TextTheme(
-        //   //   title: TextStyle(color: Colors.white),
-        //   // ),
-        //   fontFamily: 'Georgia',
-        // ),
-        // debugShowCheckedModeBanner: false,
+    // testGanZhiYear();
+    tiangandizhi.testGanZhiMonth();
+    ganZhiMonth = tiangandizhi.getGanzhiMonth(lunarTimeDigital[2],lunarTimeDigital[1]);
         return Scaffold(
           appBar: AppBar(
             title: Text("蔡竺螢国学院"),
@@ -156,6 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text('现在时辰',style: TextStyle(color: Colors.black,fontSize:30 ), ),
                 Text('\n公历: ${solarTime.year}年${solarTime.month}月${solarTime.day}日${currentHour}:${currentMin}:${currentSec}',style: TextStyle(color: Colors.black54,fontSize:20), ),
                 Text('\n农历: ${lunarTimeCN[2]}年${lunarTimeCN[1]}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
+                Text('\n${tiangandizhi.getGanZhiYear(solarTime.year)}年${tiangandizhi.getGanzhiMonth(lunarTimeDigital[2], lunarTimeDigital[1])}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
                 Text('${lunarHour}',style: TextStyle(color: Colors.black,fontSize:20),),
               ],
             ),
@@ -167,6 +170,6 @@ class _MyHomePageState extends State<MyHomePage> {
           //   ),
           // ),
         );// This trailing comma makes auto-formatting nicer for build methods.
-        // );
   }
+
 }
