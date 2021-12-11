@@ -58,14 +58,15 @@ class _MyHomePageState extends State<MyHomePage> {
   var tiangandizhi = new TianGanDiZhi();
   void getCurrentTime() async {
     solarTime = DateTime.now();
+    lunarTimeDigital = CalendarConverter.solarToLunar(
+        solarTime.year, solarTime.month, solarTime.day, Timezone.Chinese);
+    lunarTimeCN = transferDigit2Chinese(lunarTimeDigital);
     while(true) {
       await new Future.delayed(const Duration(seconds: 1));
       solarTime = DateTime.now();
       setState(() {
         lunarHour = changeSolar2LunarHour(solarTime.hour);
-        lunarTimeDigital = CalendarConverter.solarToLunar(
-            solarTime.year, solarTime.month, solarTime.day, Timezone.Chinese);
-        lunarTimeCN = transferDigit2Chinese(lunarTimeDigital);
+
         currentHour = solarTime.hour.toString();
         if (solarTime.hour < 10) {
           currentHour = "0" + currentHour;
@@ -139,8 +140,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     getCurrentTime();
     // testGanZhiYear();
-    tiangandizhi.testGanZhiMonth();
-    ganZhiMonth = tiangandizhi.getGanzhiMonth(lunarTimeDigital[2],lunarTimeDigital[1]);
+    // tiangandizhi.testGanZhiMonth();
+    ganZhiMonth = tiangandizhi.getGanZhiMonth(lunarTimeDigital[2],lunarTimeDigital[1]);
         return Scaffold(
           appBar: AppBar(
             title: Text("蔡竺螢国学院"),
@@ -156,10 +157,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 //       .headline5,
                 // ),
                 Text('现在时辰',style: TextStyle(color: Colors.black,fontSize:30 ), ),
-                Text('\n公历: ${solarTime.year}年${solarTime.month}月${solarTime.day}日${currentHour}:${currentMin}:${currentSec}',style: TextStyle(color: Colors.black54,fontSize:20), ),
+                Text('\n公历: ${solarTime.year}年${solarTime.month}月${solarTime.day}日$currentHour:$currentMin:$currentSec',style: TextStyle(color: Colors.black54,fontSize:20), ),
                 Text('\n农历: ${lunarTimeCN[2]}年${lunarTimeCN[1]}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
-                Text('\n${tiangandizhi.getGanZhiYear(solarTime.year)}年${tiangandizhi.getGanzhiMonth(lunarTimeDigital[2], lunarTimeDigital[1])}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
-                Text('${lunarHour}',style: TextStyle(color: Colors.black,fontSize:20),),
+                Text('\n${tiangandizhi.getGanZhiYear(lunarTimeDigital[2])}年${tiangandizhi.getGanZhiMonth(lunarTimeDigital[2], lunarTimeDigital[1])}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
+                Text('$lunarHour',style: TextStyle(color: Colors.black,fontSize:20),),
               ],
             ),
           ),
