@@ -1,5 +1,6 @@
 import 'package:lunar_calendar/lunar_calendar.dart';
 import 'package:flutter/material.dart';
+import 'JieQi.dart';
 import 'TianGanDiZhi.dart';
 
 void main() {
@@ -7,7 +8,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp() : super() {}
+  MyApp() : super();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -51,15 +52,22 @@ class _MyHomePageState extends State<MyHomePage> {
   String currentMin;
   String currentSec;
 
-
+  int jieQiMonth; // 可以直接转成干支月的阴历月
   String ganZhiYear;
-  String ganZhiMonth;
+  String ganZhiMonth; // 从jieQiMonth转过来的
   String ganZhiDay;
   var tiangandizhi = new TianGanDiZhi();
+  var jieQi = new JieQi(); //节气用来计算干支月
+
   void getCurrentTime() async {
     solarTime = DateTime.now();
+    var jieQiStartDay = jieQi.getJieQiStartDayIn20Century(solarTime.year, solarTime.month);
     lunarTimeDigital = CalendarConverter.solarToLunar(
         solarTime.year, solarTime.month, solarTime.day, Timezone.Chinese);
+
+    jieQiMonth = jieQi.getJieQiMonth(solarTime.month, jieQiStartDay, solarTime.day);
+
+
     lunarTimeCN = transferDigit2Chinese(lunarTimeDigital);
     while(true) {
       await new Future.delayed(const Duration(seconds: 1));
@@ -141,7 +149,8 @@ class _MyHomePageState extends State<MyHomePage> {
     getCurrentTime();
     // testGanZhiYear();
     // tiangandizhi.testGanZhiMonth();
-    ganZhiMonth = tiangandizhi.getGanZhiMonth(lunarTimeDigital[2],lunarTimeDigital[1]);
+
+    ganZhiMonth = tiangandizhi.getGanZhiMonth(lunarTimeDigital[2],jieQiMonth);
         return Scaffold(
           appBar: AppBar(
             title: Text("蔡竺螢国学院"),
