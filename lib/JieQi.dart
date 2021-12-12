@@ -24,7 +24,7 @@ class JieQi {
   // 节气是通过阳历来计算比较容易
   // 返回的是阳历日期，然后在配上阳历月，就得出节气的月日
   int getJieQiStartDayIn20Century(int solarYear, int solarMonth) {
-    double c;
+    double c = 0;
     if (solarYear < 2000 || solarYear >= 2100) {
       print("do not support year < 2000 or solarYear >= 2200");
       return -1;
@@ -48,19 +48,19 @@ class JieQi {
     var d = 0.2422 ;
 
     // truncate: 取整
-    var day = (y * d + c).truncate() + ((y - 1)/4).truncate();
+    var day = (y * d + c).truncate() - ((y - 1)/4).truncate();
     // 调整
     if (solarYear == 2016 && solarMonth == 7) { //2016,小暑
-      d ++;
+      day ++;
     }
     if (solarYear == 2002 && solarMonth == 8) { //2002,立秋
-      d ++;
+      day ++;
     }
     if (solarYear == 2089 && solarMonth == 11) { //2089,立冬
-      d ++;
+      day ++;
     }
     if (solarYear == 2019 && solarMonth == 1) { //2019,小寒
-      d --;
+      day --;
     }
 
     return day;
@@ -74,6 +74,7 @@ class JieQi {
         return solarMonth - 2;
       }
   }
+
 
 }
 /*********************************************

@@ -1,5 +1,6 @@
 import 'package:lunar_calendar/lunar_calendar.dart';
 import 'package:flutter/material.dart';
+import 'package:lunar_time/GanZhiDay.dart';
 import 'JieQi.dart';
 import 'TianGanDiZhi.dart';
 
@@ -55,9 +56,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int jieQiMonth; // 可以直接转成干支月的阴历月
   String ganZhiYear;
   String ganZhiMonth; // 从jieQiMonth转过来的
-  String ganZhiDay;
   var tiangandizhi = new TianGanDiZhi();
   var jieQi = new JieQi(); //节气用来计算干支月
+  var ganZhiDay = new GanZhiDay();
 
   void getCurrentTime() async {
     solarTime = DateTime.now();
@@ -168,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text('现在时辰',style: TextStyle(color: Colors.black,fontSize:30 ), ),
                 Text('\n公历: ${solarTime.year}年${solarTime.month}月${solarTime.day}日$currentHour:$currentMin:$currentSec',style: TextStyle(color: Colors.black54,fontSize:20), ),
                 Text('\n农历: ${lunarTimeCN[2]}年${lunarTimeCN[1]}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
-                Text('\n${tiangandizhi.getGanZhiYear(lunarTimeDigital[2])}年${tiangandizhi.getGanZhiMonth(lunarTimeDigital[2], lunarTimeDigital[1])}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
+                Text('\n${tiangandizhi.getGanZhiYear(lunarTimeDigital[2])}年$ganZhiMonth月${ganZhiDay.getGanZhiDay(solarTime.year, solarTime.month, solarTime.day)}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
                 Text('$lunarHour',style: TextStyle(color: Colors.black,fontSize:20),),
               ],
             ),

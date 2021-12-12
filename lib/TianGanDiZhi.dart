@@ -1,3 +1,6 @@
+// import 'package:lunar_time/JieQi.dart';
+import 'JieQi.dart';
+
 class TianGanDiZhi {
 // int Gan = 0;
   String GanYear = "";
@@ -34,7 +37,7 @@ class TianGanDiZhi {
     "戌"
   ]; //12 亥从最后挪到第一位,方便计算
 
-// 五虎遁
+// 支月计算：五虎遁
 /* 甲己年起丙寅月
 　　乙庚年起戊寅月
 　　丙辛年起庚寅月
@@ -85,22 +88,21 @@ class TianGanDiZhi {
     return TianganxiangheCN[GanYear];
   }
 
-  String getZhiMonth(int lunarMonth) {
-    return ZhiMonth[lunarMonth - 1];
+  String getZhiMonth(int jieQiMonth) {
+    return ZhiMonth[jieQiMonth - 1];
   }
 
-  String getGanZhiMonth(int lunarYear, int lunarMonth) {
-    return getGanMonth(lunarYear) + getZhiMonth(lunarMonth);
+  String getGanZhiMonth(int lunarYear, int jieQiMonth) {
+    return getGanMonth(lunarYear) + getZhiMonth(jieQiMonth);
   }
 
-  void testGanZhiMonth() async {
-    for (int i = 2000; i < 2050; i++) {
-      InitGanzhiYear(i);
-      await new Future.delayed(const Duration(microseconds: 10));
-      for (int month = 1; month <= 12; month++) {
-        print(GanYear + "年　" + getGanZhiMonth(i, month) + "月");
-      }
-    }
+
+  int testGanZhiMonth(int solarYear, int solarMonth, int solarDay) {
+    InitGanzhiYear(solarYear);
+    var jieQi = new JieQi();
+    var jieQiStartDay = jieQi.getJieQiStartDayIn20Century(solarYear, solarMonth);
+    var jieQiMonth = jieQi.getJieQiMonth(solarMonth, jieQiStartDay, solarDay);
+    return jieQiMonth;
   }
 
   void InitGanzhiYear(int year) {
@@ -121,5 +123,9 @@ class TianGanDiZhi {
     }
   }
 
-  String GetTianGanDizhiDay(int month) {}
+  void testGanZhiYearMonthDay(int solarYear, int solarMonth, int solarDay) {
+    InitGanzhiYear(solarYear);
+
+  }
+
 }
