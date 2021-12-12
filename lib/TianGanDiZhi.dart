@@ -73,18 +73,25 @@ class TianGanDiZhi {
     "丑",
   ];
 
+  // To call any API, need to call InitGanZhiYear first
+  void initGanZhiYear(int lunarYear) {
+    /*1、（年份- 3）/10余数对天干：如1894-3=1891 ，1891除以10余数是1即为甲。
+    2、（年份- 3）/12余数对地支：如1894-3=1891 ，1891除以12余数是7即为午，即1894年是甲午年。*/
+    int tmpGan = (lunarYear - 3) % 10;
+    GanYear = TianGan[tmpGan];
+    int tmpZhi = (lunarYear - 3) % 12;
+    ZhiYear = DiZhi[tmpZhi];
+    tianGanDizhiYear = GanYear + ZhiYear;
+  }
+
+
   String getGanZhiYear(int year) {
-    if (tianGanDizhiYear == "") {
-      InitGanzhiYear(year);
-    }
     return tianGanDizhiYear;
   }
 
 //润月需要在节气之中搞定,不涉及到这里
   String getGanMonth(int lunarYear) {
-    if (GanYear == "") {
-      InitGanzhiYear(lunarYear);
-    }
+
     return TianganxiangheCN[GanYear];
   }
 
@@ -98,34 +105,24 @@ class TianGanDiZhi {
 
 
   int testGanZhiMonth(int solarYear, int solarMonth, int solarDay) {
-    InitGanzhiYear(solarYear);
+    initGanZhiYear(solarYear);
     var jieQi = new JieQi();
     var jieQiStartDay = jieQi.getJieQiStartDayIn20Century(solarYear, solarMonth);
     var jieQiMonth = jieQi.getJieQiMonth(solarMonth, jieQiStartDay, solarDay);
     return jieQiMonth;
   }
 
-  void InitGanzhiYear(int year) {
-    /*1、（年份- 3）/10余数对天干：如1894-3=1891 ，1891除以10余数是1即为甲。
-    2、（年份- 3）/12余数对地支：如1894-3=1891 ，1891除以12余数是7即为午，即1894年是甲午年。*/
-    int tmpGan = (year - 3) % 10;
-    GanYear = TianGan[tmpGan];
-    int tmpZhi = (year - 3) % 12;
-    ZhiYear = DiZhi[tmpZhi];
-    tianGanDizhiYear = GanYear + ZhiYear;
-  }
-
   void testTianGanDiZhiYear() async {
     for (int i = 2000; i < 2050; i++) {
       await new Future.delayed(const Duration(seconds: 1));
-      InitGanzhiYear(i);
+      initGanZhiYear(i);
       print(i.toString() + " " + tianGanDizhiYear + "年");
     }
   }
 
   void testGanZhiYearMonthDay(int solarYear, int solarMonth, int solarDay) {
-    InitGanzhiYear(solarYear);
-
+    initGanZhiYear(solarYear);
+    //todo
   }
 
 }

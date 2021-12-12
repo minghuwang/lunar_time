@@ -67,12 +67,19 @@ class JieQi {
   }
 
   // 节气月是指真正的根据节气算出的阴历月数，可以直接用来转成干支月
+  // return range: 1..12
   int getJieQiMonth(int solarMonth, int jieQiStartDay, int solarDay) {
       if (jieQiStartDay <= solarDay) {
-          return solarMonth - 1;
+          solarMonth -= 1;
       } else {
-        return solarMonth - 2;
+        solarMonth -= 2;
       }
+      // if minus or zero
+      if (solarMonth < 1) {
+        solarMonth += 12;
+      }
+
+      return solarMonth;
   }
 
 

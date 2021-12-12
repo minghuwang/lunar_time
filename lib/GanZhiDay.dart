@@ -53,8 +53,21 @@ class GanZhiDay {
     }
     int tmp = (tmp1 * 5 + (tmp1/4).truncate() + 9 + solarDay + oddEvenMonthAdjust + monthAdjust) % 60;
     // 个位对应干
-    var gang = TianGan[tmp % 10 - 1];
-    var zhi = DiZhi[tmp % 12 - 1];
-    return gang + zhi;
+    var g = tmp % 10 - 1;
+    // circular
+    if (g == -1) {
+      g += 10;
+    }
+    var gan = TianGan[g];
+
+    // this is zhi
+    var z = tmp % 12 - 1;
+    // circular
+    if (z == -1) {
+      z += 12;
+    }
+    var zhi = DiZhi[z];
+
+    return gan + zhi;
   }
 }

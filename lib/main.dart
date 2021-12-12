@@ -65,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var jieQiStartDay = jieQi.getJieQiStartDayIn20Century(solarTime.year, solarTime.month);
     lunarTimeDigital = CalendarConverter.solarToLunar(
         solarTime.year, solarTime.month, solarTime.day, Timezone.Chinese);
+    tiangandizhi.initGanZhiYear(lunarTimeDigital[2]);
 
     jieQiMonth = jieQi.getJieQiMonth(solarTime.month, jieQiStartDay, solarTime.day);
 
@@ -170,7 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text('\n公历: ${solarTime.year}年${solarTime.month}月${solarTime.day}日$currentHour:$currentMin:$currentSec',style: TextStyle(color: Colors.black54,fontSize:20), ),
                 Text('\n农历: ${lunarTimeCN[2]}年${lunarTimeCN[1]}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
                 Text('\n${tiangandizhi.getGanZhiYear(lunarTimeDigital[2])}年$ganZhiMonth月${ganZhiDay.getGanZhiDay(solarTime.year, solarTime.month, solarTime.day)}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
-                Text('$lunarHour',style: TextStyle(color: Colors.black,fontSize:20),),
+                Text('\n$lunarHour',style: TextStyle(color: Colors.black54,fontSize:20),),
               ],
             ),
           ),
