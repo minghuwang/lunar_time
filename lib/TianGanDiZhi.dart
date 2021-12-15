@@ -1,16 +1,12 @@
-// import 'package:lunar_time/JieQi.dart';
+import 'package:lunar_calendar/lunar_calendar.dart';
 import 'JieQi.dart';
 
 class TianGanDiZhi {
-// int Gan = 0;
-  String GanYear = "";
-  String ZhiYear = "";
-  String tianGanDizhiYear = "";
+  String ganYear = "";
+  String zhiYear = "";
+  String ganZhiYear = "";
 
-  // int Di = 0;
-
-  int Zhi = 0;
-  List<String> TianGan = [
+  List<String> tianGan = [
     "癸",
     "甲",
     "乙",
@@ -37,7 +33,7 @@ class TianGanDiZhi {
     "戌"
   ]; //12 亥从最后挪到第一位,方便计算
 
-// 支月计算：五虎遁
+// 支月计算每年的起始月：五虎遁
 /* 甲己年起丙寅月
 　　乙庚年起戊寅月
 　　丙辛年起庚寅月
@@ -45,7 +41,6 @@ class TianGanDiZhi {
 　　戊癸年起甲寅月
 * */
 
-// List<String> TianganxiangheCN = ["甲","己","乙","庚","丙","辛","丁","壬", "戊","癸"];
   var TianganxiangheCN = {
     "甲": "丙",
     "己": "丙",
@@ -58,7 +53,31 @@ class TianGanDiZhi {
     "戊": "甲",
     "癸": "甲"
   };
-  List<String> ZhiMonth = [
+  var ganMonth2NumberMap = {
+    "甲": 0,
+    "乙": 1,
+    "丙": 2,
+    "丁": 3,
+    "戊": 4,
+    "己": 5,
+    "庚": 6,
+    "辛": 7,
+    "壬": 8,
+    "癸": 9,
+  };
+  List<String> ganMonthMap = [
+    "甲",
+    "乙",
+    "丙",
+    "丁",
+    "戊",
+    "己",
+    "庚",
+    "辛",
+    "壬",
+    "癸",
+  ];
+  List<String> zhiMonthMap = [
     "寅",
     "卯",
     "辰",
@@ -73,41 +92,60 @@ class TianGanDiZhi {
     "丑",
   ];
 
-  // To call any API, need to call InitGanZhiYear first
-  void initGanZhiYear(int lunarYear) {
+  //This is neither solar nor lunar year. Adjust the key period before Feb.3~4 and adjust the year.
+  int initGanZhiIntYear(int solarYear, int solarMonth, int solarDay) {
+    var ganZhiDigitalYear = solarYear;
+    var jieQi = new JieQi();
+    // Focus on Jan and Feb.
+    if (solarMonth == 1) {
+      ganZhiDigitalYear = solarYear - 1;
+    }
+    if (solarMonth == 2) {
+      var jieQiDay = jieQi.getMonthFirstJieQiDayFromTable(solarYear, solarMonth);
+      if (jieQiDay > solarDay) {
+        ganZhiDigitalYear = solarYear - 1;
+      }
+    }
+    return ganZhiDigitalYear;
+  }
+
+  void initGanZhiStringYear(int ganZhiDigitalYear) {
     /*1、（年份- 3）/10余数对天干：如1894-3=1891 ，1891除以10余数是1即为甲。
     2、（年份- 3）/12余数对地支：如1894-3=1891 ，1891除以12余数是7即为午，即1894年是甲午年。*/
-    int tmpGan = (lunarYear - 3) % 10;
-    GanYear = TianGan[tmpGan];
-    int tmpZhi = (lunarYear - 3) % 12;
-    ZhiYear = DiZhi[tmpZhi];
-    tianGanDizhiYear = GanYear + ZhiYear;
+    int tmpGan = (ganZhiDigitalYear - 3) % 10;
+    ganYear = tianGan[tmpGan];
+    int tmpZhi = (ganZhiDigitalYear - 3) % 12;
+    zhiYear = DiZhi[tmpZhi];
+    ganZhiYear = ganYear + zhiYear;
   }
 
 
-  String getGanZhiYear(int year) {
-    return tianGanDizhiYear;
+  String getGanZhiStringYear() {
+    return ganZhiYear;
   }
 
-//润月需要在节气之中搞定,不涉及到这里
-  String getGanMonth(int lunarYear) {
-
-    return TianganxiangheCN[GanYear];
+  //润月需要在节气之中搞定,不涉及到这里
+  String getGanMonth(int jieQiMonth) {
+    // ganYear must be init before this.
+    var startGanMonth = TianganxiangheCN[ganYear];
+    int ganMonthMapIndex = ganMonth2NumberMap[startGanMonth];
+    return ganMonthMap[(ganMonthMapIndex + jieQiMonth - 1) % 10];
   }
 
   String getZhiMonth(int jieQiMonth) {
-    return ZhiMonth[jieQiMonth - 1];
+    return zhiMonthMap[jieQiMonth - 1];
   }
 
-  String getGanZhiMonth(int lunarYear, int jieQiMonth) {
-    return getGanMonth(lunarYear) + getZhiMonth(jieQiMonth);
+  String getGanZhiMonth(int jieQiMonth) {
+    return getGanMonth(jieQiMonth) + getZhiMonth(jieQiMonth);
   }
 
 
   int testGanZhiMonth(int solarYear, int solarMonth, int solarDay) {
-    initGanZhiYear(solarYear);
+    initGanZhiStringYear(solarYear);
     var jieQi = new JieQi();
-    var jieQiStartDay = jieQi.getJieQiStartDayIn20Century(solarYear, solarMonth);
+    var jieQiStartDay = jieQi.getMonthFirstJieQiDayFromTable(
+        solarYear, solarMonth);
     var jieQiMonth = jieQi.getJieQiMonth(solarMonth, jieQiStartDay, solarDay);
     return jieQiMonth;
   }
@@ -115,13 +153,13 @@ class TianGanDiZhi {
   void testTianGanDiZhiYear() async {
     for (int i = 2000; i < 2050; i++) {
       await new Future.delayed(const Duration(seconds: 1));
-      initGanZhiYear(i);
-      print(i.toString() + " " + tianGanDizhiYear + "年");
+      initGanZhiStringYear(i);
+      print(i.toString() + " " + ganZhiYear + "年");
     }
   }
 
   void testGanZhiYearMonthDay(int solarYear, int solarMonth, int solarDay) {
-    initGanZhiYear(solarYear);
+    initGanZhiStringYear(solarYear);
     //todo
   }
 

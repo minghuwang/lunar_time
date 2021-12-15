@@ -54,26 +54,24 @@ class _MyHomePageState extends State<MyHomePage> {
   String currentSec;
 
   int jieQiMonth; // 可以直接转成干支月的阴历月
-  String ganZhiYear;
   String ganZhiMonth; // 从jieQiMonth转过来的
-  var tiangandizhi = new TianGanDiZhi();
+  var tianGanDiZhi = new TianGanDiZhi();
   var jieQi = new JieQi(); //节气用来计算干支月
   var ganZhiDay = new GanZhiDay();
 
+
+
   void getCurrentTime() async {
-    solarTime = DateTime.now();
-    var jieQiStartDay = jieQi.getJieQiStartDayIn20Century(solarTime.year, solarTime.month);
-    lunarTimeDigital = CalendarConverter.solarToLunar(
-        solarTime.year, solarTime.month, solarTime.day, Timezone.Chinese);
-    tiangandizhi.initGanZhiYear(lunarTimeDigital[2]);
-
-    jieQiMonth = jieQi.getJieQiMonth(solarTime.month, jieQiStartDay, solarTime.day);
-
-
-    lunarTimeCN = transferDigit2Chinese(lunarTimeDigital);
+    // testGanZhiYear();
+    // tiangandizhi.testGanZhiMonth();
+    // jieQi.testGetJieQiStartDay();
+    // jieQi.testGetMonthFirstJieQiDayFromTable();
+    // First time need to be running to avoid null point
+    // as in while it has 1 second delay to flush
+    prepareYearMonth();
     while(true) {
       await new Future.delayed(const Duration(seconds: 1));
-      solarTime = DateTime.now();
+      prepareYearMonth();
       setState(() {
         lunarHour = changeSolar2LunarHour(solarTime.hour);
 
@@ -91,6 +89,18 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       });
     }
+  }
+
+  // Create this function for avoiding dup code only
+  void prepareYearMonth() {
+    solarTime = DateTime.now();
+    lunarTimeDigital = CalendarConverter.solarToLunar(
+        solarTime.year, solarTime.month, solarTime.day, Timezone.Chinese);
+    tianGanDiZhi.initGanZhiStringYear(tianGanDiZhi.initGanZhiIntYear(solarTime.year, solarTime.month, solarTime.day));
+    var jieQiStartDay = jieQi.getMonthFirstJieQiDayFromTable(solarTime.year, solarTime.month);
+    lunarTimeCN = transferDigit2Chinese(lunarTimeDigital);
+    jieQiMonth = jieQi.getJieQiMonth(solarTime.month, jieQiStartDay, solarTime.day);
+    ganZhiMonth = tianGanDiZhi.getGanZhiMonth(jieQiMonth);
   }
 
   String changeSolar2LunarHour(int hour) {
@@ -149,10 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     getCurrentTime();
-    // testGanZhiYear();
-    // tiangandizhi.testGanZhiMonth();
 
-    ganZhiMonth = tiangandizhi.getGanZhiMonth(lunarTimeDigital[2],jieQiMonth);
         return Scaffold(
           appBar: AppBar(
             title: Text("蔡竺螢国学院"),
@@ -170,7 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text('现在时辰',style: TextStyle(color: Colors.black,fontSize:30 ), ),
                 Text('\n公历: ${solarTime.year}年${solarTime.month}月${solarTime.day}日$currentHour:$currentMin:$currentSec',style: TextStyle(color: Colors.black54,fontSize:20), ),
                 Text('\n农历: ${lunarTimeCN[2]}年${lunarTimeCN[1]}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
-                Text('\n${tiangandizhi.getGanZhiYear(lunarTimeDigital[2])}年$ganZhiMonth月${ganZhiDay.getGanZhiDay(solarTime.year, solarTime.month, solarTime.day)}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
+                Text('\n${tianGanDiZhi.getGanZhiStringYear()}年$ganZhiMonth月${ganZhiDay.getGanZhiDay(solarTime.year, solarTime.month, solarTime.day)}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
                 Text('\n$lunarHour',style: TextStyle(color: Colors.black54,fontSize:20),),
               ],
             ),
