@@ -160,7 +160,6 @@ class JieQi {
       // 这个代表着支干年也得减一
       if (jieQiMonth < 1) {
         jieQiMonth += 12;
-
       }
 
       return jieQiMonth;

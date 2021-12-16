@@ -4,8 +4,6 @@ import 'JieQi.dart';
 class TianGanDiZhi {
   String ganYear = "";
   String zhiYear = "";
-  String ganZhiYear = "";
-
   List<String> tianGan = [
     "癸",
     "甲",
@@ -109,18 +107,14 @@ class TianGanDiZhi {
     return ganZhiDigitalYear;
   }
 
-  void initGanZhiStringYear(int ganZhiDigitalYear) {
+  String initGanZhiStringYear(int ganZhiDigitalYear) {
     /*1、（年份- 3）/10余数对天干：如1894-3=1891 ，1891除以10余数是1即为甲。
     2、（年份- 3）/12余数对地支：如1894-3=1891 ，1891除以12余数是7即为午，即1894年是甲午年。*/
     int tmpGan = (ganZhiDigitalYear - 3) % 10;
     ganYear = tianGan[tmpGan];
     int tmpZhi = (ganZhiDigitalYear - 3) % 12;
     zhiYear = DiZhi[tmpZhi];
-    ganZhiYear = ganYear + zhiYear;
-  }
-
-
-  String getGanZhiStringYear() {
+    var ganZhiYear = ganYear + zhiYear;
     return ganZhiYear;
   }
 
@@ -142,7 +136,7 @@ class TianGanDiZhi {
 
 
   int testGanZhiMonth(int solarYear, int solarMonth, int solarDay) {
-    initGanZhiStringYear(solarYear);
+    // var ganZhiYear = initGanZhiStringYear(solarYear);
     var jieQi = new JieQi();
     var jieQiStartDay = jieQi.getMonthFirstJieQiDayFromTable(
         solarYear, solarMonth);
@@ -153,7 +147,7 @@ class TianGanDiZhi {
   void testTianGanDiZhiYear() async {
     for (int i = 2000; i < 2050; i++) {
       await new Future.delayed(const Duration(seconds: 1));
-      initGanZhiStringYear(i);
+      var ganZhiYear = initGanZhiStringYear(i);
       print(i.toString() + " " + ganZhiYear + "年");
     }
   }

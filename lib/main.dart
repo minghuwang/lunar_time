@@ -17,15 +17,6 @@ class MyApp extends StatelessWidget {
       title: '时辰',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: '当日时辰'),
@@ -45,19 +36,32 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   List<int> lunarTimeDigital;
-  List<String> lunarTimeCN;
+  List<String> lunarTimeString;
 
-  DateTime solarTime;
-  String lunarHour;
+  DateTime currentSolarTime;
   String currentHour;
   String currentMin;
   String currentSec;
 
+  String ganZhiYear;
   int jieQiMonth; // 可以直接转成干支月的阴历月
   String ganZhiMonth; // 从jieQiMonth转过来的
+  String ganZhiDay;
+  String ganZhiHour;
+
+  // For date picker
+  DateTime selectedDate = DateTime.now();
+  // For time picker
+  TimeOfDay selectedTime = TimeOfDay.now();
+  String selectGanZhiYear;
+  String selectGanZhiMonth;
+  String selectGanZhiDay;
+  String selectGanZhiHour;// = changeSolar2ganZhiHour(selectedTime.hour);
+  List<String> selectLunarTimeString;
+
   var tianGanDiZhi = new TianGanDiZhi();
   var jieQi = new JieQi(); //节气用来计算干支月
-  var ganZhiDay = new GanZhiDay();
+  var myGanZhiDay = new GanZhiDay();
 
 
 
@@ -68,23 +72,25 @@ class _MyHomePageState extends State<MyHomePage> {
     // jieQi.testGetMonthFirstJieQiDayFromTable();
     // First time need to be running to avoid null point
     // as in while it has 1 second delay to flush
-    prepareYearMonth();
+    currentSolarTime = DateTime.now();
+    prepareCurrentDate(currentSolarTime);
     while(true) {
       await new Future.delayed(const Duration(seconds: 1));
-      prepareYearMonth();
+      currentSolarTime = DateTime.now();
+      prepareCurrentDate(currentSolarTime);
       setState(() {
-        lunarHour = changeSolar2LunarHour(solarTime.hour);
+        ganZhiHour = changeSolar2ganZhiHour(currentSolarTime.hour);
 
-        currentHour = solarTime.hour.toString();
-        if (solarTime.hour < 10) {
+        currentHour = currentSolarTime.hour.toString();
+        if (currentSolarTime.hour < 10) {
           currentHour = "0" + currentHour;
         }
-        currentMin = solarTime.minute.toString();
-        if (solarTime.minute < 10) {
+        currentMin = currentSolarTime.minute.toString();
+        if (currentSolarTime.minute < 10) {
           currentMin = "0" + currentMin;
         }
-        currentSec = solarTime.second.toString();
-        if (solarTime.second < 10) {
+        currentSec = currentSolarTime.second.toString();
+        if (currentSolarTime.second < 10) {
           currentSec = "0" + currentSec;
         }
       });
@@ -92,35 +98,46 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // Create this function for avoiding dup code only
-  void prepareYearMonth() {
-    solarTime = DateTime.now();
+  void prepareCurrentDate(DateTime solarTime) {
     lunarTimeDigital = CalendarConverter.solarToLunar(
         solarTime.year, solarTime.month, solarTime.day, Timezone.Chinese);
-    tianGanDiZhi.initGanZhiStringYear(tianGanDiZhi.initGanZhiIntYear(solarTime.year, solarTime.month, solarTime.day));
+    lunarTimeString = transferDigit2Chinese(lunarTimeDigital);
+    ganZhiYear = tianGanDiZhi.initGanZhiStringYear(tianGanDiZhi.initGanZhiIntYear(solarTime.year, solarTime.month, solarTime.day));
     var jieQiStartDay = jieQi.getMonthFirstJieQiDayFromTable(solarTime.year, solarTime.month);
-    lunarTimeCN = transferDigit2Chinese(lunarTimeDigital);
     jieQiMonth = jieQi.getJieQiMonth(solarTime.month, jieQiStartDay, solarTime.day);
     ganZhiMonth = tianGanDiZhi.getGanZhiMonth(jieQiMonth);
+    ganZhiDay = myGanZhiDay.getGanZhiDay(solarTime.year, solarTime.month, solarTime.day);
+
+  }
+  void prepareSelectedDate(DateTime selectedDate) {
+    var selectLunarTimeDigital = CalendarConverter.solarToLunar(
+        selectedDate.year, selectedDate.month, selectedDate.day, Timezone.Chinese);
+    selectLunarTimeString = transferDigit2Chinese(selectLunarTimeDigital);
+    selectGanZhiYear = tianGanDiZhi.initGanZhiStringYear(tianGanDiZhi.initGanZhiIntYear(selectedDate.year, selectedDate.month, selectedDate.day));
+    var jieQiStartDay = jieQi.getMonthFirstJieQiDayFromTable(selectedDate.year, selectedDate.month);
+    var jieQiMonth = jieQi.getJieQiMonth(selectedDate.month, jieQiStartDay, selectedDate.day);
+    selectGanZhiMonth = tianGanDiZhi.getGanZhiMonth(jieQiMonth);
+    selectGanZhiDay = myGanZhiDay.getGanZhiDay(selectedDate.year, selectedDate.month, selectedDate.day);
   }
 
-  String changeSolar2LunarHour(int hour) {
-    List<String> lunarHour = [
+  String changeSolar2ganZhiHour(int solarHour) {
+    List<String> ganZhiHour = [
       "子时", "丑时", "寅时", "卯时",
       "辰时", "巳时", "午时", "未时",
       "申时", "酉时", "戌时", "亥时",
     ];
-    if (hour >= 23 || hour < 1) return lunarHour[0];
-    if (hour >= 1 && hour < 3) return lunarHour[1];
-    if (hour >= 3 && hour < 5) return lunarHour[2];
-    if (hour >= 5 && hour < 7) return lunarHour[3];
-    if (hour >= 7 && hour < 9) return lunarHour[4];
-    if (hour >= 9 && hour < 11) return lunarHour[5];
-    if (hour >= 11 && hour < 13) return lunarHour[6];
-    if (hour >= 13 && hour < 15) return lunarHour[7];
-    if (hour >= 15 && hour < 17) return lunarHour[8];
-    if (hour >= 17 && hour < 19) return lunarHour[9];
-    if (hour >= 19 && hour < 21) return lunarHour[10];
-    if (hour >= 21 && hour < 23) return lunarHour[11];
+    if (solarHour >= 23 || solarHour < 1) return ganZhiHour[0];
+    if (solarHour >= 1 && solarHour < 3) return ganZhiHour[1];
+    if (solarHour >= 3 && solarHour < 5) return ganZhiHour[2];
+    if (solarHour >= 5 && solarHour < 7) return ganZhiHour[3];
+    if (solarHour >= 7 && solarHour < 9) return ganZhiHour[4];
+    if (solarHour >= 9 && solarHour < 11) return ganZhiHour[5];
+    if (solarHour >= 11 && solarHour < 13) return ganZhiHour[6];
+    if (solarHour >= 13 && solarHour < 15) return ganZhiHour[7];
+    if (solarHour >= 15 && solarHour < 17) return ganZhiHour[8];
+    if (solarHour >= 17 && solarHour < 19) return ganZhiHour[9];
+    if (solarHour >= 19 && solarHour < 21) return ganZhiHour[10];
+    if (solarHour >= 21 && solarHour < 23) return ganZhiHour[11];
   }
   //Transfer 2021 to 二零二一
   List<String> transferDigit2Chinese(List<int> lunarTime) {
@@ -156,39 +173,141 @@ class _MyHomePageState extends State<MyHomePage> {
     return tmp;
   }
 
+  String getGanZhiStringYear() {
+    return ganZhiYear;
+  }
+
   @override
   Widget build(BuildContext context) {
     getCurrentTime();
-
-        return Scaffold(
+    prepareSelectedDate(selectedDate);
+    selectGanZhiHour = changeSolar2ganZhiHour(selectedTime.hour);
+        return DefaultTabController(
+        length: 3,
+        child:Scaffold(
           appBar: AppBar(
-            title: Text("蔡竺螢国学院"),
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                // Text('现在时辰',
-                //   style: Theme
-                //       .of(context)
-                //       .textTheme
-                //       .headline5,
-                // ),
-                Text('现在时辰',style: TextStyle(color: Colors.black,fontSize:30 ), ),
-                Text('\n公历: ${solarTime.year}年${solarTime.month}月${solarTime.day}日$currentHour:$currentMin:$currentSec',style: TextStyle(color: Colors.black54,fontSize:20), ),
-                Text('\n农历: ${lunarTimeCN[2]}年${lunarTimeCN[1]}月${lunarTimeCN[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
-                Text('\n${tianGanDiZhi.getGanZhiStringYear()}年$ganZhiMonth月${ganZhiDay.getGanZhiDay(solarTime.year, solarTime.month, solarTime.day)}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
-                Text('\n$lunarHour',style: TextStyle(color: Colors.black54,fontSize:20),),
+            bottom: const TabBar(
+              tabs: [
+                // Tab(icon: Icon(Icons.directions_car)),
+                Tab(text:"当日时辰"),
+                // Tab(icon: Icon(Icons.directions_transit)),
+                Tab(text:"时辰"),
+                // Tab(icon: Icon(Icons.directions_bike)),
+                Tab(text: "其他"),
               ],
             ),
+            title: Text("蔡竺螢国学院"),
+          ),
+          body: TabBarView(
+            children: [
+              currentGanZhi(),
+              selectedGanZhi(),
+              Icon(Icons.directions_bike),
+            ],
           ),
           // floatingActionButton: FloatingActionButton(
           //   onPressed: getCurrentTime,
           //   tooltip: '刷新',
           //   child: Icon(Icons.refresh
-          //   ),
-          // ),
-        );// This trailing comma makes auto-formatting nicer for build methods.
+          //   ),),
+
+        ));// This trailing comma makes auto-formatting nicer for build methods.
+  }
+
+  Widget currentGanZhi() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text('现在时辰',style: TextStyle(color: Colors.black,fontSize:30 ), ),
+          Text('\n公历: ${currentSolarTime.year}年${currentSolarTime.month}月${currentSolarTime.day}日$currentHour:$currentMin:$currentSec',style: TextStyle(color: Colors.black54,fontSize:20), ),
+          Text('\n农历: ${lunarTimeString[2]}年${lunarTimeString[1]}月${lunarTimeString[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
+          Text('\n${getGanZhiStringYear()}年$ganZhiMonth月$ganZhiDay日',style: TextStyle(color: Colors.black54,fontSize:20), ),
+          Text('\n$ganZhiHour',style: TextStyle(color: Colors.black54,fontSize:20),),
+        ],
+      ),
+    );
+  }
+  Widget selectedGanZhi() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 10, right: 10),
+                child:ElevatedButton(
+                  onPressed: () {
+                    _selectDate(context);
+                  },
+                  child: Text("选择阳历日期", style: TextStyle(fontSize:20),),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                child:ElevatedButton(
+                  onPressed: () {
+                    _selectTime(context);
+                  },
+                  child: Text("选择时间", style: TextStyle(fontSize:20),),
+                ),
+              ),
+            ],
+          ),
+          (() { if (selectedDate != null) {
+            return Text('\n公历: ${selectedDate.year}年${selectedDate.month}月${selectedDate.day}日${selectedTime.hour}:${selectedTime.minute}',
+              style: TextStyle(color: Colors.black54,fontSize:20), );}
+            else{ return Text('');}
+          }()),
+          (() { if (selectLunarTimeString != null) {
+            return Text('\n农历: ${selectLunarTimeString[2]}年${selectLunarTimeString[1]}月${selectLunarTimeString[0]}日',
+              style: TextStyle(color: Colors.black54,fontSize:20), );}
+            else{ return Text('');}
+          }()),
+          (() { if (selectGanZhiYear != null) {
+            return Text('\n$selectGanZhiYear年$selectGanZhiMonth月$selectGanZhiDay日',
+              style: TextStyle(color: Colors.black54,fontSize:20), );}
+            else{ return Text('');}
+          }()),
+          (() {
+            if (selectGanZhiHour != null) {
+            return Text('\n$selectGanZhiHour',style: TextStyle(color: Colors.black54,fontSize:20),);}
+            else{ return Text('');}
+          }()),
+    // Todo
+        ],
+      ),
+    );
+  }
+  _selectDate(BuildContext context) async {
+    final DateTime selected = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(1901),
+      lastDate: DateTime(2099),
+
+    );
+    if (selected != null && selected != selectedDate)
+      setState(() {
+        selectedDate = selected;
+        prepareSelectedDate(selectedDate);
+      });
+  }
+  _selectTime(BuildContext context) async {
+    final TimeOfDay timeOfDay = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+      initialEntryMode: TimePickerEntryMode.dial,
+    );
+    if(timeOfDay != null && timeOfDay != selectedTime)
+    {
+      setState(() {
+        selectedTime = timeOfDay;
+        selectGanZhiHour = changeSolar2ganZhiHour(selectedTime.hour);
+      });
+    }
   }
 
 }
