@@ -16,10 +16,10 @@ class GanZhiDay {
 （97×5＋97÷4＋9＋16＋30＋2）÷60＝9余26，26即为六十甲子序数。6对应天干己，26除12余2对应地支丑，对应干支为“己丑”。
   *
   * */
-  List<String> TianGan = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸",];
-  List<String> DiZhi =   ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥",];
+  static List<String> TianGan = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸",];
+  static List<String> DiZhi =   ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥",];
 
-  String getGanZhiDay(int solarYear, int solarMonth, int solarDay){
+  static String getGanZhiDay(int solarYear, int solarMonth, int solarDay){
     int monthAdjust = 0;
     // leap year adjust
     if ((solarYear%4 == 0) &&

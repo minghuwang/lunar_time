@@ -1,10 +1,9 @@
-import 'package:lunar_calendar/lunar_calendar.dart';
 import 'JieQi.dart';
 
 class TianGanDiZhi {
-  String ganYear = "";
-  String zhiYear = "";
-  List<String> tianGan = [
+  static String ganYear = "";
+  static String zhiYear = "";
+  static List<String> tianGan = [
     "癸",
     "甲",
     "乙",
@@ -16,7 +15,7 @@ class TianGanDiZhi {
     "辛",
     "壬"
   ]; //10 癸从最后挪到第一位, 方便计算  奇数为阳, 偶数为阴
-  List<String> DiZhi = [
+  static List<String> DiZhi = [
     "亥",
     "子",
     "丑",
@@ -39,7 +38,7 @@ class TianGanDiZhi {
 　　戊癸年起甲寅月
 * */
 
-  var TianganxiangheCN = {
+  static var TianganxiangheCN = {
     "甲": "丙",
     "己": "丙",
     "乙": "戊",
@@ -51,7 +50,7 @@ class TianGanDiZhi {
     "戊": "甲",
     "癸": "甲"
   };
-  var ganMonth2NumberMap = {
+  static var ganMonth2NumberMap = {
     "甲": 0,
     "乙": 1,
     "丙": 2,
@@ -63,7 +62,7 @@ class TianGanDiZhi {
     "壬": 8,
     "癸": 9,
   };
-  List<String> ganMonthMap = [
+  static List<String> ganMonthMap = [
     "甲",
     "乙",
     "丙",
@@ -75,7 +74,7 @@ class TianGanDiZhi {
     "壬",
     "癸",
   ];
-  List<String> zhiMonthMap = [
+  static List<String> zhiMonthMap = [
     "寅",
     "卯",
     "辰",
@@ -91,7 +90,7 @@ class TianGanDiZhi {
   ];
 
   //This is neither solar nor lunar year. Adjust the key period before Feb.3~4 and adjust the year.
-  int initGanZhiIntYear(int solarYear, int solarMonth, int solarDay) {
+  static int initGanZhiIntYear(int solarYear, int solarMonth, int solarDay) {
     var ganZhiDigitalYear = solarYear;
     var jieQi = new JieQi();
     // Focus on Jan and Feb.
@@ -99,7 +98,7 @@ class TianGanDiZhi {
       ganZhiDigitalYear = solarYear - 1;
     }
     if (solarMonth == 2) {
-      var jieQiDay = jieQi.getMonthFirstJieQiDayFromTable(solarYear, solarMonth);
+      var jieQiDay = JieQi.getMonthFirstJieQiDayFromTable(solarYear, solarMonth);
       if (jieQiDay > solarDay) {
         ganZhiDigitalYear = solarYear - 1;
       }
@@ -107,7 +106,7 @@ class TianGanDiZhi {
     return ganZhiDigitalYear;
   }
 
-  String initGanZhiStringYear(int ganZhiDigitalYear) {
+  static String initGanZhiStringYear(int ganZhiDigitalYear) {
     /*1、（年份- 3）/10余数对天干：如1894-3=1891 ，1891除以10余数是1即为甲。
     2、（年份- 3）/12余数对地支：如1894-3=1891 ，1891除以12余数是7即为午，即1894年是甲午年。*/
     int tmpGan = (ganZhiDigitalYear - 3) % 10;
@@ -119,18 +118,18 @@ class TianGanDiZhi {
   }
 
   //润月需要在节气之中搞定,不涉及到这里
-  String getGanMonth(int jieQiMonth) {
+  static String getGanMonth(int jieQiMonth) {
     // ganYear must be init before this.
     var startGanMonth = TianganxiangheCN[ganYear];
     int ganMonthMapIndex = ganMonth2NumberMap[startGanMonth];
     return ganMonthMap[(ganMonthMapIndex + jieQiMonth - 1) % 10];
   }
 
-  String getZhiMonth(int jieQiMonth) {
+  static String getZhiMonth(int jieQiMonth) {
     return zhiMonthMap[jieQiMonth - 1];
   }
 
-  String getGanZhiMonth(int jieQiMonth) {
+  static String getGanZhiMonth(int jieQiMonth) {
     return getGanMonth(jieQiMonth) + getZhiMonth(jieQiMonth);
   }
 
@@ -138,9 +137,9 @@ class TianGanDiZhi {
   int testGanZhiMonth(int solarYear, int solarMonth, int solarDay) {
     // var ganZhiYear = initGanZhiStringYear(solarYear);
     var jieQi = new JieQi();
-    var jieQiStartDay = jieQi.getMonthFirstJieQiDayFromTable(
+    var jieQiStartDay = JieQi.getMonthFirstJieQiDayFromTable(
         solarYear, solarMonth);
-    var jieQiMonth = jieQi.getJieQiMonth(solarMonth, jieQiStartDay, solarDay);
+    var jieQiMonth = JieQi.getJieQiMonth(solarMonth, jieQiStartDay, solarDay);
     return jieQiMonth;
   }
 

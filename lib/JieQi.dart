@@ -127,7 +127,7 @@ class JieQi {
   //   return day;
   // }
 
-  int getMonthFirstJieQiDayFromTable(int solarYear, int solarMonth) {
+  static int getMonthFirstJieQiDayFromTable(int solarYear, int solarMonth) {
     if (solarYear > 1900 && solarYear < 2000) {
       return jieQiTable[solarYear % 100 - 1][(solarMonth - 1) * 2];
     }
@@ -149,7 +149,7 @@ class JieQi {
   }
   // 节气月是指真正的根据节气算出的阴历月数，可以直接用来转成干支月
   // return range: 1..12
-  int getJieQiMonth(int solarMonth, int jieQiStartDay, int solarDay) {
+  static int getJieQiMonth(int solarMonth, int jieQiStartDay, int solarDay) {
     int jieQiMonth;
       if (jieQiStartDay <= solarDay) {
         jieQiMonth = solarMonth - 1;
