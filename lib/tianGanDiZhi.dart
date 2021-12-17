@@ -1,4 +1,4 @@
-import 'JieQi.dart';
+import 'jieQi.dart';
 
 class TianGanDiZhi {
   static String ganYear = "";
@@ -50,7 +50,7 @@ class TianGanDiZhi {
     "戊": "甲",
     "癸": "甲"
   };
-  static var ganMonth2NumberMap = {
+  static Map<String, int> ganMonth2NumberMap = {
     "甲": 0,
     "乙": 1,
     "丙": 2,
@@ -120,9 +120,9 @@ class TianGanDiZhi {
   //润月需要在节气之中搞定,不涉及到这里
   static String getGanMonth(int jieQiMonth) {
     // ganYear must be init before this.
-    var startGanMonth = TianganxiangheCN[ganYear];
-    int ganMonthMapIndex = ganMonth2NumberMap[startGanMonth];
-    return ganMonthMap[(ganMonthMapIndex + jieQiMonth - 1) % 10];
+    String? startGanMonth = TianganxiangheCN[ganYear];
+    int? ganMonthMapIndex = ganMonth2NumberMap[startGanMonth];
+    return ganMonthMap[(ganMonthMapIndex! + jieQiMonth - 1) % 10];
   }
 
   static String getZhiMonth(int jieQiMonth) {
@@ -133,12 +133,10 @@ class TianGanDiZhi {
     return getGanMonth(jieQiMonth) + getZhiMonth(jieQiMonth);
   }
 
-
   int testGanZhiMonth(int solarYear, int solarMonth, int solarDay) {
     // var ganZhiYear = initGanZhiStringYear(solarYear);
     var jieQi = new JieQi();
-    var jieQiStartDay = JieQi.getMonthFirstJieQiDayFromTable(
-        solarYear, solarMonth);
+    var jieQiStartDay = JieQi.getMonthFirstJieQiDayFromTable(solarYear, solarMonth);
     var jieQiMonth = JieQi.getJieQiMonth(solarMonth, jieQiStartDay, solarDay);
     return jieQiMonth;
   }
@@ -155,5 +153,4 @@ class TianGanDiZhi {
     initGanZhiStringYear(solarYear);
     //todo
   }
-
 }
