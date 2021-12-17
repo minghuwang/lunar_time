@@ -37,7 +37,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   // List<int> lunarTimeDigital;
-  List<String> lunarTimeString;
+  // List<String> lunarTimeString;
+  static String lunarTimeString;
 
   static DateTime currentSolarTime;
   static String currentHour;
@@ -59,7 +60,8 @@ class _MyHomePageState extends State<MyHomePage> {
   static String selectGanZhiMonth;
   static String selectGanZhiDay;
   static String selectGanZhiHour;
-  static List<String> selectLunarTimeString;
+  // static List<String> selectLunarTimeString;
+  static String selectLunarTimeString;
 
   var tianGanDiZhi = new TianGanDiZhi();
   var jieQi = new JieQi(); //节气用来计算干支月
@@ -68,8 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     currentSolarTime = DateTime.now();
-    prepareCurrentSolarDate(currentSolarTime);
-    prepareSelectedSolarDate(currentSolarTime);
+    getCurrentSolarDate(currentSolarTime);
+    getSelectedSolarDate(currentSolarTime);
     selectGanZhiHour = changeSolar2ganZhiHour(selectedTime.hour);
     getCurrentTime();
   }
@@ -87,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
     while(true) {
       await new Future.delayed(const Duration(seconds: 1));
       currentSolarTime = DateTime.now();
-      prepareCurrentSolarDate(currentSolarTime);
+      getCurrentSolarDate(currentSolarTime);
       setState(() {
         ganZhiHour = changeSolar2ganZhiHour(currentSolarTime.hour);
 
@@ -108,12 +110,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // Create this function for avoiding dup code only
-  void prepareCurrentSolarDate(DateTime mySolarTime) {
+  static void getCurrentSolarDate(DateTime mySolarTime) {
     // lunarTimeDigital = CalendarConverter.solarToLunar(
     //     solarTime.year, solarTime.month, solarTime.day, Timezone.Chinese);
     var solarTime = Solar(solarYear: currentSolarTime.year, solarMonth: currentSolarTime.month, solarDay:currentSolarTime.day);
     Lunar myLunarTime = LunarSolarConverter.solarToLunar(solarTime);
-    lunarTimeString = transferDigit2Chinese(myLunarTime);
+    lunarTimeString = myLunarTime.toString(); //transferDigit2Chinese(myLunarTime);
     ganZhiYear = TianGanDiZhi.initGanZhiStringYear(TianGanDiZhi.initGanZhiIntYear(mySolarTime.year, mySolarTime.month, mySolarTime.day));
     var jieQiStartDay = JieQi.getMonthFirstJieQiDayFromTable(mySolarTime.year, mySolarTime.month);
     jieQiMonth = JieQi.getJieQiMonth(mySolarTime.month, jieQiStartDay, mySolarTime.day);
@@ -121,25 +123,28 @@ class _MyHomePageState extends State<MyHomePage> {
     ganZhiDay = GanZhiDay.getGanZhiDay(mySolarTime.year, mySolarTime.month, mySolarTime.day);
 
   }
-  static void prepareSelectedSolarDate(DateTime mySelectedSolarDate) {
+  // This is for electing date/time
+  static void getSelectedSolarDate(DateTime mySelectedSolarDate) {
     // var selectLunarTimeDigital = CalendarConverter.solarToLunar(
     //     mySelectedSolarDate.year, mySelectedSolarDate.month, mySelectedSolarDate.day, Timezone.Chinese);
-    var solarTime = Solar(solarYear: currentSolarTime.year, solarMonth: currentSolarTime.month, solarDay:currentSolarTime.day);
-    Lunar myLunarTime = LunarSolarConverter.solarToLunar(solarTime);
-    selectLunarTimeString = transferDigit2Chinese(myLunarTime);
+    var selectSolarTime = Solar(solarYear: mySelectedSolarDate.year, solarMonth: mySelectedSolarDate.month, solarDay:mySelectedSolarDate.day);
+    Lunar myLunarTime = LunarSolarConverter.solarToLunar(selectSolarTime);
+    // selectLunarTimeString = transferDigit2Chinese(myLunarTime);
+    selectLunarTimeString = myLunarTime.toString(); // transferDigit2Chinese(myLunarTime);
     selectGanZhiYear = TianGanDiZhi.initGanZhiStringYear(TianGanDiZhi.initGanZhiIntYear(mySelectedSolarDate.year, mySelectedSolarDate.month, mySelectedSolarDate.day));
     var jieQiStartDay = JieQi.getMonthFirstJieQiDayFromTable(mySelectedSolarDate.year, mySelectedSolarDate.month);
     var jieQiMonth = JieQi.getJieQiMonth(mySelectedSolarDate.month, jieQiStartDay, mySelectedSolarDate.day);
     selectGanZhiMonth = TianGanDiZhi.getGanZhiMonth(jieQiMonth);
     selectGanZhiDay = GanZhiDay.getGanZhiDay(mySelectedSolarDate.year, mySelectedSolarDate.month, mySelectedSolarDate.day);
   }
-
-  void prepareSelectedLunarDate(DateTime mySelectedLunarDate) {
+  // This is for election lunar data/time
+  static void getSelectedLunarDate(DateTime mySelectedLunarDate) {
     // var selectLunarTimeDigital = CalendarConverter.solarToLunar(
     //     mySelectedLunarDate.year, mySelectedLunarDate.month, mySelectedLunarDate.day, Timezone.Chinese);
     Lunar myLunarTime = Lunar(lunarYear: mySelectedLunarDate.year, lunarMonth: mySelectedLunarDate.month, lunarDay: mySelectedLunarDate.day,
         isLeap: (mySelectedLunarDate.year%4 == 0));
-    selectLunarTimeString = transferDigit2Chinese(myLunarTime);
+    // selectLunarTimeString = transferDigit2Chinese(myLunarTime);
+    selectLunarTimeString = myLunarTime.toString(); // transferDigit2Chinese(myLunarTime);
     Solar mySolarTime = LunarSolarConverter.lunarToSolar(myLunarTime);
     //when selecting a lunar, the solar time should also be updated. lunar decides solar.
     selectedSolarDate = mySolarTime.dateTime;
@@ -156,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "辰时", "巳时", "午时", "未时",
       "申时", "酉时", "戌时", "亥时",
     ];
-    if (solarHour >= 23 || solarHour < 1) return ganZhiHour[0];
+
     if (solarHour >= 1 && solarHour < 3) return ganZhiHour[1];
     if (solarHour >= 3 && solarHour < 5) return ganZhiHour[2];
     if (solarHour >= 5 && solarHour < 7) return ganZhiHour[3];
@@ -168,6 +173,9 @@ class _MyHomePageState extends State<MyHomePage> {
     if (solarHour >= 17 && solarHour < 19) return ganZhiHour[9];
     if (solarHour >= 19 && solarHour < 21) return ganZhiHour[10];
     if (solarHour >= 21 && solarHour < 23) return ganZhiHour[11];
+    if (solarHour >= 23 || solarHour < 1) return ganZhiHour[0];
+    // cannot be here
+    return null;
   }
   //Transfer 2021 to 二零二一
   static List<String> transferDigit2Chinese(Lunar lunarTime) {
@@ -251,7 +259,8 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Text('现在时辰',style: TextStyle(color: Colors.black,fontSize:30 ), ),
           Text('\n公历: ${currentSolarTime.year}年${currentSolarTime.month}月${currentSolarTime.day}日$currentHour:$currentMin:$currentSec',style: TextStyle(color: Colors.black54,fontSize:20), ),
-          Text('\n农历: ${lunarTimeString[2]}年${lunarTimeString[1]}月${lunarTimeString[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
+          // Text('\n农历: ${lunarTimeString[2]}年${lunarTimeString[1]}月${lunarTimeString[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
+          Text('\n农历: $lunarTimeString',style: TextStyle(color: Colors.black54,fontSize:20), ),
           Text('\n${getGanZhiStringYear()}年$ganZhiMonth月$ganZhiDay日',style: TextStyle(color: Colors.black54,fontSize:20), ),
           Text('\n$ganZhiHour',style: TextStyle(color: Colors.black54,fontSize:20),),
         ],
@@ -306,7 +315,7 @@ class _MyHomePageState extends State<MyHomePage> {
             else{ return Text('');}
           }()),
           (() { if (selectLunarTimeString != null) {
-            return Text('\n农历: ${selectLunarTimeString[2]}年${selectLunarTimeString[1]}月${selectLunarTimeString[0]}日',
+            return Text('\n农历: $selectLunarTimeString',
               style: TextStyle(color: Colors.black54,fontSize:20), );}
             else{ return Text('');}
           }()),
@@ -336,7 +345,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (selected != null && selected != selectedSolarDate)
       setState(() {
         selectedSolarDate = selected;
-        prepareSelectedSolarDate(selectedSolarDate);
+        getSelectedSolarDate(selectedSolarDate);
       });
   }
   _selectLunarDate(BuildContext context) async {
@@ -350,7 +359,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (selected != null && selected != selectedLunarDate)
       setState(() {
         selectedLunarDate = selected;
-        prepareSelectedLunarDate(selectedLunarDate);
+        getSelectedLunarDate(selectedLunarDate);
       });
   }
   _selectTime(BuildContext context) async {
