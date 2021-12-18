@@ -272,8 +272,12 @@ class _MyHomePageState extends State<MyHomePage> {
         length: 3,
         child: Scaffold(
           appBar: AppBar(
+            elevation: 5,
+            backgroundColor: Colors.lightBlue,
+            foregroundColor: Colors.white,
             bottom: const TabBar(
-              labelColor: Colors.pink,
+              indicatorColor: Colors.white,
+              // labelColor: Colors.pink,
               tabs: [
                 // Tab(icon: Icon(Icons.directions_car)),
                 Tab(text: "当日时辰"),
@@ -283,7 +287,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 Tab(text: "其他"),
               ],
             ),
-            title: Text("蔡竺螢国学院"),
+            title: Text(
+              "蔡竺螢国学院",
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
           ),
           body: TabBarView(
             children: [
@@ -315,7 +322,7 @@ class _MyHomePageState extends State<MyHomePage> {
             style: TextStyle(color: Colors.black54, fontSize: 20),
           ),
           Text(
-            '\n农历: ${lunarTimeString[2]}年${lunarTimeString[1]}月${lunarTimeString[0]}日',
+            '\n农历: ${lunarTimeString[2]}年${lunarTimeString[1]}月${lunarTimeString[0]}',
             style: TextStyle(color: Colors.black54, fontSize: 20),
           ),
           // Text(
@@ -323,7 +330,7 @@ class _MyHomePageState extends State<MyHomePage> {
           //   style: TextStyle(color: Colors.black54, fontSize: 20),
           // ),
           Text(
-            '\n${getGanZhiStringYear()}年$ganZhiMonth月$ganZhiDay日',
+            '\n$ganZhiYear年$ganZhiMonth月$ganZhiDay日',
             style: TextStyle(color: Colors.black54, fontSize: 20),
           ),
           Text(
@@ -404,7 +411,7 @@ class _MyHomePageState extends State<MyHomePage> {
             if (selectLunarTimeString != null) {
               return Text(
                 // '\n农历: $selectLunarTimeString',
-                '\n农历: ${selectLunarTimeString[2]}年${selectLunarTimeString[1]}月${selectLunarTimeString[0]}日',
+                '\n农历: ${selectLunarTimeString[2]}年${selectLunarTimeString[1]}月${selectLunarTimeString[0]}',
                 style: TextStyle(color: Colors.black54, fontSize: 20),
               );
             } else {
