@@ -17,9 +17,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '时辰',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      // theme: ThemeData(
+      //   primarySwatch: Colors.blue,
+      // ),
       home: MyHomePage(title: "当日时辰"),
     );
   }
@@ -263,64 +263,100 @@ class _MyHomePageState extends State<MyHomePage> {
     return ganZhiYear;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // getCurrentTime();
-    // prepareSelectedSolarDate(selectedSolarDate);
-    // selectGanZhiHour = changeSolar2ganZhiHour(selectedTime.hour);
-    return DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-            elevation: 5,
-            backgroundColor: Colors.lightBlue,
-            foregroundColor: Colors.white,
-            bottom: const TabBar(
-              indicatorColor: Colors.white,
-              // labelColor: Colors.pink,
-              tabs: [
-                // Tab(icon: Icon(Icons.directions_car)),
-                Tab(
-                  icon: Icon(
-                    Icons.access_alarm,
-                  ),
-                  text: "当日时辰",
-                ), //(text: "当日时辰"),
-                // Tab(icon: Icon(Icons.directions_transit)),
-                Tab(
-                    icon: Icon(
-                      Icons.wb_sunny_rounded,
-                    ),
-                    text: "时辰"),
-                // Tab(icon: Icon(Icons.directions_bike)),
-                Tab(
-                    icon: Icon(
-                      Icons.account_box,
-                    ),
-                    text: "其他"),
-              ],
-            ),
-            title: Text(
-              "蔡竺螢国学院",
-              style: TextStyle(color: Colors.white, fontSize: 25),
-            ),
-          ),
-          body: TabBarView(
-            children: [
-              currentGanZhi(),
-              selectedGanZhi(),
-              Icon(Icons.directions_bike),
-            ],
-          ),
-          // floatingActionButton: FloatingActionButton(
-          //   onPressed: getCurrentTime,
-          //   tooltip: '刷新',
-          //   child: Icon(Icons.refresh
-          //   ),),
-        )); // This trailing comma makes auto-formatting nicer for build methods.
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
-  Widget currentGanZhi() {
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> _widgetOptions = [
+      currentGanZhi(),
+      selectedGanZhi(),
+      Text(
+        'Stub',
+        style: optionStyle,
+      ),
+    ];
+    return Scaffold(
+      appBar: AppBar(
+          // elevation: 5,
+          // backgroundColor: Colors.lightBlue,
+          // foregroundColor: Colors.white,
+          // bottom: const TabBar(
+          //   indicatorColor: Colors.white,
+          //   // labelColor: Colors.pink,
+          //   tabs: [
+          //     // Tab(icon: Icon(Icons.directions_car)),
+          //     Tab(
+          //       icon: Icon(
+          //         Icons.access_alarm,
+          //       ),
+          //       text: "当日时辰",
+          //     ), //(text: "当日时辰"),
+          //     // Tab(icon: Icon(Icons.directions_transit)),
+          //     Tab(
+          //         icon: Icon(
+          //           Icons.wb_sunny_rounded,
+          //         ),
+          //         text: "时辰"),
+          //     // Tab(icon: Icon(Icons.directions_bike)),
+          //     Tab(
+          //         icon: Icon(
+          //           Icons.account_box,
+          //         ),
+          //         text: "其他"),
+          //   ],
+          // ),
+          title: Row(children: [
+        Padding(
+            padding: const EdgeInsets.only(top: 30, bottom: 30, right: 10),
+            child: Icon(Icons.anchor, size: 30)),
+        Padding(
+          padding: const EdgeInsets.only(top: 30, bottom: 30),
+          child: Text(
+            "蔡竺螢国学院",
+            style: TextStyle(fontSize: 30),
+          ),
+        ),
+      ])),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+        // child: _selectedIndex == 0? currentGanZhi():
+        // ((_selectedIndex == 1)?selectedGanZhi():Text("test",)),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '当日时辰',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.access_alarm),
+            label: '时辰',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.school),
+            label: '其他',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: getCurrentTime,
+      //   tooltip: '刷新',
+      //   child: Icon(Icons.refresh
+      //   ),),
+    ); // This trailing comma makes auto-formatting nicer for build methods.
+  }
+
+  static Widget currentGanZhi() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
