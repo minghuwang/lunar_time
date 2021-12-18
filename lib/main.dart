@@ -280,11 +280,24 @@ class _MyHomePageState extends State<MyHomePage> {
               // labelColor: Colors.pink,
               tabs: [
                 // Tab(icon: Icon(Icons.directions_car)),
-                Tab(text: "当日时辰"),
+                Tab(
+                  icon: Icon(
+                    Icons.access_alarm,
+                  ),
+                  text: "当日时辰",
+                ), //(text: "当日时辰"),
                 // Tab(icon: Icon(Icons.directions_transit)),
-                Tab(text: "时辰"),
+                Tab(
+                    icon: Icon(
+                      Icons.wb_sunny_rounded,
+                    ),
+                    text: "时辰"),
                 // Tab(icon: Icon(Icons.directions_bike)),
-                Tab(text: "其他"),
+                Tab(
+                    icon: Icon(
+                      Icons.account_box,
+                    ),
+                    text: "其他"),
               ],
             ),
             title: Text(
@@ -438,7 +451,6 @@ class _MyHomePageState extends State<MyHomePage> {
               return Text('');
             }
           }()),
-          // Todo
         ],
       ),
     );
