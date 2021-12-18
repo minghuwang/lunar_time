@@ -37,8 +37,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   // List<int> lunarTimeDigital;
-  // List<String> lunarTimeString;
-  static String? lunarTimeString;
+  static List<String> lunarTimeString = [];
+  // static String? lunarTimeString;
 
   static DateTime? currentSolarTime;
   static String? currentHour;
@@ -61,8 +61,8 @@ class _MyHomePageState extends State<MyHomePage> {
   static String? selectGanZhiMonth;
   static String? selectGanZhiDay;
   static String? selectGanZhiHour;
-  // static List<String> selectLunarTimeString;
-  static String? selectLunarTimeString;
+  static List<String> selectLunarTimeString = [];
+  // static String? selectLunarTimeString;
 
   var tianGanDiZhi = new TianGanDiZhi();
   var jieQi = new JieQi(); //节气用来计算干支月
@@ -118,7 +118,8 @@ class _MyHomePageState extends State<MyHomePage> {
         solarMonth: currentSolarTime!.month,
         solarDay: currentSolarTime!.day);
     Lunar myLunarTime = LunarSolarConverter.solarToLunar(solarTime);
-    lunarTimeString = myLunarTime.toString(); //transferDigit2Chinese(myLunarTime);
+    // lunarTimeString = myLunarTime.toString(); //transferDigit2Chinese(myLunarTime);
+    lunarTimeString = transferDigit2Chinese(myLunarTime);
     ganZhiYear = TianGanDiZhi.initGanZhiStringYear(
         TianGanDiZhi.initGanZhiIntYear(mySolarTime.year, mySolarTime.month, mySolarTime.day));
     var jieQiStartDay = JieQi.getMonthFirstJieQiDayFromTable(mySolarTime.year, mySolarTime.month);
@@ -136,8 +137,8 @@ class _MyHomePageState extends State<MyHomePage> {
         solarMonth: mySelectedSolarDate.month,
         solarDay: mySelectedSolarDate.day);
     Lunar myLunarTime = LunarSolarConverter.solarToLunar(selectSolarTime);
-    // selectLunarTimeString = transferDigit2Chinese(myLunarTime);
-    selectLunarTimeString = myLunarTime.toString(); // transferDigit2Chinese(myLunarTime);
+    selectLunarTimeString = transferDigit2Chinese(myLunarTime);
+    // selectLunarTimeString = myLunarTime.toString(); // transferDigit2Chinese(myLunarTime);
     selectGanZhiYear = TianGanDiZhi.initGanZhiStringYear(TianGanDiZhi.initGanZhiIntYear(
         mySelectedSolarDate.year, mySelectedSolarDate.month, mySelectedSolarDate.day));
     var jieQiStartDay =
@@ -158,8 +159,8 @@ class _MyHomePageState extends State<MyHomePage> {
         lunarMonth: mySelectedLunarDate.month,
         lunarDay: mySelectedLunarDate.day,
         isLeap: (mySelectedLunarDate.year % 4 == 0));
-    // selectLunarTimeString = transferDigit2Chinese(myLunarTime);
-    selectLunarTimeString = myLunarTime.toString(); // transferDigit2Chinese(myLunarTime);
+    selectLunarTimeString = transferDigit2Chinese(myLunarTime);
+    // selectLunarTimeString = myLunarTime.toString(); // transferDigit2Chinese(myLunarTime);
     Solar mySolarTime = LunarSolarConverter.lunarToSolar(myLunarTime);
     //when selecting a lunar, the solar time should also be updated. lunar decides solar.
     selectedSolarDate = mySolarTime.dateTime;
@@ -209,17 +210,26 @@ class _MyHomePageState extends State<MyHomePage> {
   //Transfer 2021 to 二零二一
   static List<String> transferDigit2Chinese(Lunar lunarTime) {
     List<String> l = [];
-    l.add(changeDigit2ChineseStringForMonthNDay(lunarTime.lunarDay)); // day
-    l.add(changeDigit2ChineseStringForMonthNDay(lunarTime.lunarMonth)); //month
+    l.add(changeDigit2ChineseStringForDay(lunarTime.lunarDay)); // day
+    l.add(changeDigit2ChineseStringForMonth(lunarTime.lunarMonth)); //month
     l.add(changeDigit2ChineseStringForYear(lunarTime.lunarYear)); //year
     return l;
   }
 
-  static String changeDigit2ChineseStringForMonthNDay(int time) {
+  static String changeDigit2ChineseStringForMonth(int time) {
+    List<String> zeroTo12 = [
+      // 零 is stub
+      "零", "正", "二", "三", "四", "五", "六", "七", "八", "九",
+      "十", "十一", "腊",
+    ];
+    return zeroTo12[time];
+  }
+
+  static String changeDigit2ChineseStringForDay(int time) {
     List<String> zeroTo31 = [
       // 零 is stub
-      "零", "一", "二", "三", "四", "五", "六", "七", "八", "九",
-      "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九",
+      "零", "初一", "初二", "初三", "初四", "初五", "初六", "初七", "初八", "初九",
+      "初十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九",
       "二十", "二十一", "二十二", "二十三", "二十四", "二十五", "二十六", "二十七", "二十八", "二十九",
       "三十", "三十一",
     ];
@@ -263,6 +273,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Scaffold(
           appBar: AppBar(
             bottom: const TabBar(
+              labelColor: Colors.pink,
               tabs: [
                 // Tab(icon: Icon(Icons.directions_car)),
                 Tab(text: "当日时辰"),
@@ -299,14 +310,18 @@ class _MyHomePageState extends State<MyHomePage> {
             style: TextStyle(color: Colors.black, fontSize: 30),
           ),
           Text(
-            '\n公历: ${currentSolarTime!.year}年${currentSolarTime!.month}月${currentSolarTime!.day}日$currentHour:$currentMin:$currentSec',
+            '\n公历: ${currentSolarTime!.year}年${currentSolarTime!.month}月${currentSolarTime!.day}日'
+            '$currentHour:$currentMin:$currentSec',
             style: TextStyle(color: Colors.black54, fontSize: 20),
           ),
-          // Text('\n农历: ${lunarTimeString[2]}年${lunarTimeString[1]}月${lunarTimeString[0]}日',style: TextStyle(color: Colors.black54,fontSize:20), ),
           Text(
-            '\n农历: $lunarTimeString',
+            '\n农历: ${lunarTimeString[2]}年${lunarTimeString[1]}月${lunarTimeString[0]}日',
             style: TextStyle(color: Colors.black54, fontSize: 20),
           ),
+          // Text(
+          //   '\n农历: $lunarTimeString',
+          //   style: TextStyle(color: Colors.black54, fontSize: 20),
+          // ),
           Text(
             '\n${getGanZhiStringYear()}年$ganZhiMonth月$ganZhiDay日',
             style: TextStyle(color: Colors.black54, fontSize: 20),
@@ -377,7 +392,8 @@ class _MyHomePageState extends State<MyHomePage> {
           (() {
             if (selectedSolarDate != null) {
               return Text(
-                '\n公历: ${selectedSolarDate.year}年${selectedSolarDate.month}月${selectedSolarDate.day}日${selectedTime.hour}:${selectedTime.minute}',
+                '\n公历: ${selectedSolarDate.year}年${selectedSolarDate.month}月${selectedSolarDate.day}日'
+                '${selectedTime.hour}:${selectedTime.minute}',
                 style: TextStyle(color: Colors.black54, fontSize: 20),
               );
             } else {
@@ -387,7 +403,8 @@ class _MyHomePageState extends State<MyHomePage> {
           (() {
             if (selectLunarTimeString != null) {
               return Text(
-                '\n农历: $selectLunarTimeString',
+                // '\n农历: $selectLunarTimeString',
+                '\n农历: ${selectLunarTimeString[2]}年${selectLunarTimeString[1]}月${selectLunarTimeString[0]}日',
                 style: TextStyle(color: Colors.black54, fontSize: 20),
               );
             } else {
